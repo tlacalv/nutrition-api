@@ -4,7 +4,7 @@
   "description": "An app to store and manage recipes and their nutrition values",
   "main": "index.js",
   "scripts": {
-    "auth:dev": "nodemon src/auth/index.js"
+    "auth:dev": "DEBUG=app:* nodemon src/auth/index.js"
   },
   "keywords": [],
   "author": "Tlacaelel Leon",
