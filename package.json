@@ -1,0 +1,27 @@
+{
+  "name": "nutrition-coocking",
+  "version": "1.0.0",
+  "description": "An app to store and manage recipes and their nutrition values",
+  "main": "index.js",
+  "scripts": {
+    "auth:dev": "nodemon src/auth/index.js"
+  },
+  "keywords": [],
+  "author": "Tlacaelel Leon",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "@hapi/boom": "^9.1.0",
+    "@hapi/joi": "^17.1.1",
+    "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^4.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.6.3",
+    "passport": "^0.4.1",
+    "passport-http": "^0.3.0"
+  }
+}
