@@ -1,8 +1,6 @@
 //dotenv config
 const express = require("express")
 const app = express()
-const { createUserSchema } =require('./utils/schemas/users')
-const validationHandler = require('./utils/middleware/validationHandler')
 const {errorHandler, wrapErrors, logErrors} = require('./utils/middleware/errorHandlers')
 const jwt = require("jsonwebtoken")
 const boom = require('@hapi/boom')
@@ -19,6 +17,7 @@ app.use(errorHandler)
 authRoutes(app)
 
 app.use('*',(req, res, next) => {
+  res.status(404)
   res.json(boom.notFound('missing'))
 })
 
