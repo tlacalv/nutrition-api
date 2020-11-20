@@ -4,6 +4,11 @@ const validationHandler = require('../utils/middleware/validationHandler')
 const { config } = require('../config')
 const boom = require('@hapi/boom')
 const UsersService = require('../services/users')
+const passport = require('passport')
+const { errorBoom} = require('../utils/functions')
+const { compareSync } = require('bcrypt')
+
+require('../utils/auth/strategies/basic')
 
 const usersService = new UsersService()
 
@@ -13,10 +18,27 @@ const authRoutes = (app) => {
 
   router.post(
     '/login',
-    (req, res) => {
-      const body = req.body;
-      console.log(body)
-      res.json({ message: "success"})
+    async (req, res,next) => {
+
+      //passport
+      passport.authenticate('basic', (error, user) => {
+        try{
+          if(error || !user){
+            errorBoom(error,res)
+            next(error)
+            return
+          }
+          req.login(user, {session: false}, async (err) => {
+  
+          })
+        } catch(err) {
+          next(err)
+        }
+        
+        console.log('user ', user)
+
+      })(req,res,next)
+      // res.json({ message: "success"})
     }
   )
   router.post(
@@ -61,7 +83,7 @@ const authRoutes = (app) => {
   )
   
   router.post(
-    '/login',
+    '/token',
     (req, res) => {
       const body = req.body;
       console.log(body)
