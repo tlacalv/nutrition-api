@@ -48,14 +48,14 @@ const authRoutes = (app) => {
       const body = req.body
       let {email} = body
       const {admin} = req.query
-      let role;
+      let key;
 
       if (admin && admin === config.adminKey) {
-        role = config.adminKey
+        key = config.adminKey
       }else {
-        role = config.regularKey
+        key = config.regularKey
       }
-      let user = {...body, role}
+      let user = {...body, key}
 
       try {
         //check for registered user
