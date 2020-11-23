@@ -5,12 +5,14 @@ const { config } = require('../config')
 const boom = require('@hapi/boom')
 const UsersService = require('../services/users')
 const passport = require('passport')
+const jwt = require('jsonwebtoken')
 const { errorBoom} = require('../utils/functions')
-const { compareSync } = require('bcrypt')
+const ApiKeyService = require('../services/apiKeys')
 
 require('../utils/auth/strategies/basic')
 
 const usersService = new UsersService()
+const apiKeysService = new ApiKeyService()
 
 const authRoutes = (app) => {
   const router = express.Router()
@@ -29,13 +31,40 @@ const authRoutes = (app) => {
             return
           }
           req.login(user, {session: false}, async (err) => {
-  
+            if(err){
+              next(err)
+            }
+            //get user data
+            const { _id: id, name, email, key } = user;
+            //obtenemos scopes
+            const apiKey = await apiKeysService.getApiKey({ token: key });
+            if(!apiKey) {
+              errorBoom(boom.unauthorized(),res)
+              next(boom.unauthorized())
+              return
+            }
+            
+            //creamos payload con los datos de usuario y con scopes
+            const payload = {
+              sub: id,
+              name,
+              email,
+              scopes: apiKey.scopes
+            }
+            //generamos JWT
+            const token = jwt.sign(payload, config.jwtSecret, {
+              expiresIn: '15m'
+            });
+            //regresamos status 200 y el JWT
+            return res.status(200).json({
+              token,
+              user: { id, name, email }
+            });
           })
         } catch(err) {
           next(err)
         }
         
-        console.log('user ', user)
 
       })(req,res,next)
       // res.json({ message: "success"})

@@ -6,7 +6,8 @@ const config = {
   dbHost: process.env.DB_HOST,
   dev: process.env.NODE_ENV !== 'production',
   adminKey: process.env.ADMIN_KEY,
-  regularKey: process.env.REGULAR_KEY
+  regularKey: process.env.REGULAR_KEY,
+  jwtSecret: process.env.JWT_SECRET
 }
 
 module.exports = { config }

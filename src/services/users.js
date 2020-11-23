@@ -1,5 +1,5 @@
 const MongoLib = require('../lib/mongo');
-const bycrop = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 class UsersService {
     constructor( ) {
@@ -14,7 +14,7 @@ class UsersService {
 
     async createUser({ user }) {
         const { name, email, password, key } = user;
-        const hashedPassword = await bycrop.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
 
         const createUserId = await this.mongoDB.create(this.collection, {
             name,
