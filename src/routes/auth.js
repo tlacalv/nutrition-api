@@ -6,7 +6,7 @@ const boom = require('@hapi/boom')
 const UsersService = require('../services/users')
 const passport = require('passport')
 const jwt = require('jsonwebtoken')
-const { errorBoom} = require('../utils/functions')
+const errorBoom = require('../utils/functions/errorBoom')
 const ApiKeyService = require('../services/apiKeys')
 
 require('../utils/auth/strategies/basic')
@@ -18,8 +18,7 @@ const authRoutes = (app) => {
   const router = express.Router()
   app.use('/api/auth', router)
 
-  router.post(
-    '/login',
+  router.post('/login',
     async (req, res,next) => {
 
       //passport
@@ -55,9 +54,13 @@ const authRoutes = (app) => {
             const token = jwt.sign(payload, config.jwtSecret, {
               expiresIn: '15m'
             });
+            const refreshToken = jwt.sign(payload, config.refreshTokenSecret, {
+              expiresIn: '2m'
+            })
             //regresamos status 200 y el JWT
             return res.status(200).json({
               token,
+              refreshToken,
               user: { id, name, email }
             });
           })
@@ -70,8 +73,7 @@ const authRoutes = (app) => {
       // res.json({ message: "success"})
     }
   )
-  router.post(
-    '/sign-up',
+  router.post('/sign-up',
     validationHandler(createUserSchema),
     async (req, res, next) => {
       const body = req.body
@@ -111,8 +113,7 @@ const authRoutes = (app) => {
     }
   )
   
-  router.post(
-    '/token',
+  router.post('/token',
     (req, res) => {
       const body = req.body;
       console.log(body)

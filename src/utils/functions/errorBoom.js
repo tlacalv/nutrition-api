@@ -8,6 +8,4 @@ const errorBoom = (error, res) => {
   }
 }
 
-module.exports = {
-  errorBoom
-}
+module.exports = errorBoom
