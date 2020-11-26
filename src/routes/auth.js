@@ -55,8 +55,9 @@ const authRoutes = (app) => {
               expiresIn: '15m'
             });
             const refreshToken = jwt.sign(payload, config.refreshTokenSecret, {
-              expiresIn: '2m'
+              expiresIn: '60d'
             })
+            //###add refreshtoken to list###
             //regresamos status 200 y el JWT
             return res.status(200).json({
               token,
@@ -115,8 +116,25 @@ const authRoutes = (app) => {
   
   router.post('/token',
     (req, res) => {
-      const body = req.body;
-      console.log(body)
+      const refreshToken = req.body.token;
+      if (refreshToken == null) return errorBoom(boom.unauthorized(),res)
+      // if (!refreshTokens.includes(refreshToken)) return errorBoom(boom.forbidden(),res)
+
+      jwt.verify(refreshToken, config.refreshTokenSecret, (err, user) => {
+        if (err) return errorBoom(boom.forbidden(),res)
+        let { sub, name, email, scopes } = user
+        let payload = { sub, name, email, scopes }
+        const token = jwt.sign(payload, config.jwtSecret, {
+          expiresIn: '15m'
+        });
+        const refreshToken = jwt.sign(payload, config.refreshTokenSecret, {
+          expiresIn: '60d'
+        })
+
+
+        res.json({ token, refreshToken})
+      })
+      
       res.json({ message: "success"})
       
     }
