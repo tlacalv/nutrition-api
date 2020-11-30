@@ -8,11 +8,13 @@ const passport = require('passport')
 const jwt = require('jsonwebtoken')
 const errorBoom = require('../utils/functions/errorBoom')
 const ApiKeyService = require('../services/apiKeys')
+const RefreshTokensService = require('../services/refreshToken')
 
 require('../utils/auth/strategies/basic')
 
 const usersService = new UsersService()
 const apiKeysService = new ApiKeyService()
+const refreshTokensService = new RefreshTokensService()
 
 const authRoutes = (app) => {
   const router = express.Router()
@@ -58,10 +60,12 @@ const authRoutes = (app) => {
               expiresIn: '60d'
             })
             //###add refreshtoken to list###
+            const refreshTokenId = await refreshTokensService.createToken({token:refreshToken})
             //regresamos status 200 y el JWT
             return res.status(200).json({
               token,
               refreshToken,
+              refreshTokenId: refreshTokenId,
               user: { id, name, email }
             });
           })

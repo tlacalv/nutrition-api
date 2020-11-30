@@ -7,7 +7,6 @@ const UsersService = require('../../../services/users');
 //passport use, con un nuevo objeto de basicStrategy de passport-http
 passport.use(new BasicStrategy(async (email, password, cb) => {
   const userService = new UsersService();
-  console.log('something')
   try {
     //get user
     const user = await userService.getUser({ email });
