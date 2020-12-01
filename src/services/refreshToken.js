@@ -17,7 +17,7 @@ class RefreshTokensService {
     return createdRefreshTokenId
   }
   async deleteToken({token}) {
-    const deletedRefreshTokenId = await this.mongoDB.delete(this.collection, token)
+    const deletedRefreshTokenId = await this.mongoDB.deleteByParam(this.collection, 'token', token)
     return deletedRefreshTokenId
   }
 }

@@ -1,4 +1,5 @@
 const express = require('express')
+const debug = require("debug")("app:api");
 const { createUserSchema } =require('../utils/schemas/users')
 const validationHandler = require('../utils/middleware/validationHandler')
 const { config } = require('../config')
@@ -135,6 +136,21 @@ const authRoutes = (app) => {
       
       res.json({ message: "success"})
       
+    }
+  )
+  router.delete('/logout',
+    async (req, res) => {
+      const refreshToken = req.body.token;
+      try {
+        const {deletedCount} = await refreshTokensService.deleteToken({token: refreshToken})
+        res.status(200).json({
+          message: "session ended",
+          id: deletedCount
+        })
+      } catch(err) {
+        errorBoom(boom.internal(),res)
+        debug(err)
+      }
     }
   )
 }

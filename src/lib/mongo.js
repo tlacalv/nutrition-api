@@ -67,12 +67,12 @@ class MongoLib {
       })
       .then(() => id)
   }
-  deleteByParam(collection, param) {
+  deleteByParam(collection, param, value) {
     return this.connect()
       .then(db => {
-        return db.collection(collection).deleteOne({ param });
+        return db.collection(collection).deleteOne({ [param]:value });
       })
-      .then(() => id)
+      .then((result) => result)
   }
 }
 module.exports = MongoLib
