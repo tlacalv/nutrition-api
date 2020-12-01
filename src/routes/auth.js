@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken')
 const errorBoom = require('../utils/functions/errorBoom')
 const ApiKeyService = require('../services/apiKeys')
 const RefreshTokensService = require('../services/refreshToken')
+const signJWT = require('../utils/functions/signjwt')
+const signRefreshJWT = require('../utils/functions/signrefreshjwt')
 
 require('../utils/auth/strategies/basic')
 
@@ -53,12 +55,8 @@ const authRoutes = (app) => {
               scopes: apiKey.scopes
             }
             //generamos JWT
-            const token = jwt.sign(payload, config.jwtSecret, {
-              expiresIn: '15m'
-            });
-            const refreshToken = jwt.sign(payload, config.refreshTokenSecret, {
-              expiresIn: '60d'
-            })
+            const token = signJWT(payload)
+            const refreshToken = signRefreshJWT(payload)
             //###add refreshtoken to list###
             const refreshTokenId = await refreshTokensService.createToken({token:refreshToken})
             //regresamos status 200 y el JWT
@@ -128,12 +126,8 @@ const authRoutes = (app) => {
         if (err) return errorBoom(boom.forbidden(),res)
         let { sub, name, email, scopes } = user
         let payload = { sub, name, email, scopes }
-        const token = jwt.sign(payload, config.jwtSecret, {
-          expiresIn: '15m'
-        });
-        const refreshToken = jwt.sign(payload, config.refreshTokenSecret, {
-          expiresIn: '60d'
-        })
+        const token = signJWT(payload)
+        const refreshToken = signRefreshJWT(payload)
 
 
         res.json({ token, refreshToken})
