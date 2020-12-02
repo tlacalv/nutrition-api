@@ -118,23 +118,22 @@ const authRoutes = (app) => {
   )
   
   router.post('/token',
-    (req, res) => {
+    async (req, res) => {
       const refreshToken = req.body.token;
       if (refreshToken == null) return errorBoom(boom.unauthorized(),res)
-      // if (!refreshTokens.includes(refreshToken)) return errorBoom(boom.forbidden(),res)
+      const refreshTokenExists = await refreshTokensService.getToekn({token: refreshToken})
+      
+      if (!refreshTokenExists) return errorBoom(boom.forbidden(),res)
 
       jwt.verify(refreshToken, config.refreshTokenSecret, (err, user) => {
         if (err) return errorBoom(boom.forbidden(),res)
         let { sub, name, email, scopes } = user
         let payload = { sub, name, email, scopes }
         const token = signJWT(payload)
-        const refreshToken = signRefreshJWT(payload)
 
 
-        res.json({ token, refreshToken})
+        return res.json({ token})
       })
-      
-      res.json({ message: "success"})
       
     }
   )
