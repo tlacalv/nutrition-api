@@ -40,7 +40,7 @@ const authRoutes = (app) => {
             }
             //get user data
             const { _id: id, name, email, key } = user;
-            //obtenemos scopes
+            //get scopes
             const apiKey = await apiKeysService.getApiKey({ token: key });
             if(!apiKey) {
               errorBoom(boom.unauthorized(),res)
@@ -48,19 +48,21 @@ const authRoutes = (app) => {
               return
             }
             
-            //creamos payload con los datos de usuario y con scopes
+            //make payload with user info and scopes
             const payload = {
               sub: id,
               name,
               email,
               scopes: apiKey.scopes
             }
-            //generamos JWT
+            //generate JWT and refresh Token
             const token = signJWT(payload)
             const refreshToken = signRefreshJWT(payload)
-            //###add refreshtoken to list###
+
+            //Save refrsh token to DB
             const refreshTokenId = await refreshTokensService.createToken({token:refreshToken})
-            //regresamos status 200 y el JWT
+
+
             return res.status(200).json({
               token,
               refreshToken,
@@ -74,7 +76,6 @@ const authRoutes = (app) => {
         
 
       })(req,res,next)
-      // res.json({ message: "success"})
     }
   )
   router.post('/sign-up',
@@ -83,14 +84,15 @@ const authRoutes = (app) => {
       const body = req.body
       let {email} = body
       const {admin} = req.query
-      let key;
+      let key, user;
 
+      //check for admin key in the request
       if (admin && admin === config.adminKey) {
         key = config.adminKey
       }else {
         key = config.regularKey
       }
-      let user = {...body, key}
+      user = {...body, key}
 
       try {
         //check for registered user
@@ -104,6 +106,8 @@ const authRoutes = (app) => {
           return
 
         }
+
+        //create user
         const createdUserId = await usersService.createUser({user})
         res.status(201).json({ 
           data: createdUserId,
@@ -119,12 +123,13 @@ const authRoutes = (app) => {
   
   router.post('/token',
     async (req, res) => {
+      //validate refresh token
       const refreshToken = req.body.token;
       if (refreshToken == null) return errorBoom(boom.unauthorized(),res)
       const refreshTokenExists = await refreshTokensService.getToekn({token: refreshToken})
-      
       if (!refreshTokenExists) return errorBoom(boom.forbidden(),res)
 
+      //verify refresh token with JWT
       jwt.verify(refreshToken, config.refreshTokenSecret, (err, user) => {
         if (err) return errorBoom(boom.forbidden(),res)
         let { sub, name, email, scopes } = user
