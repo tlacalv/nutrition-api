@@ -40,6 +40,12 @@ class MongoLib {
         return db.collection(collection).find(query).toArray();
       })
   }
+  search(collection, query, sort) {
+    return this.connect()
+      .then(db => {
+        return db.collection(collection).find(query).sort(sort);
+      })
+  }
   get(collection, id) {
     return this.connect()
       .then(db => {

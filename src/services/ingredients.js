@@ -5,6 +5,7 @@ class IngredientsService {
         this.collection = 'ingredients';
         this.mongoDB = new MongoLib();
     }
+  // db.getCollection('ingredients').find({$text: { $search: "Tomato jalapeño"}},{score: { $meta: "textScore"}}).sort({score: {$meta: "textScore"}})
     async getIngredients () {
         const ingredients = await this.mongoDB.getAll(this.collection, {})
         return ingredients || []
@@ -12,6 +13,12 @@ class IngredientsService {
     async getUserIngredients ({userId}) {
         const query = userId && {userId}
         const ingredients = await this.mongoDB.getAll(this.collection, query)
+        return ingredients || []
+    }
+    async searchIngredient ({text}) {
+        const query = { $text: {$search: text}, score: { $meta: "textScore"}}
+        const sort = {score: {$meta: "textScore"}}
+        const ingredients = await this.mongoDB.search(this.collection, query, sort)
         return ingredients || []
     }
     async getIngredient ({ ingredientId }) {
