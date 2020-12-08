@@ -5,6 +5,7 @@ const {errorHandler, wrapErrors, logErrors} = require('./utils/middleware/errorH
 const jwt = require("jsonwebtoken")
 const boom = require('@hapi/boom')
 const authRoutes = require('./routes/auth')
+const ingredientsRoutes = require('./routes/ingredients')
 
 
 app.use(express.json())
@@ -15,6 +16,7 @@ app.use(errorHandler)
 
 
 authRoutes(app)
+ingredientsRoutes(app)
 
 app.use('*',(req, res, next) => {
   res.status(404)

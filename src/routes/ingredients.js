@@ -10,7 +10,7 @@ const errorBoom = require('../utils/functions/errorBoom')
 const ApiKeyService = require('../services/apiKeys')
 const RefreshTokensService = require('../services/refreshToken')
 
-require('../utils/auth/strategies/basic')
+require('../utils/auth/strategies/jwt')
 
 const apiKeysService = new ApiKeyService()
 const refreshTokensService = new RefreshTokensService()
@@ -20,26 +20,31 @@ const ingredientsRoutes = (app) => {
   app.use('/api/ingredients', router)
 
   router.get('/',
+    passport.authenticate('jwt', {session: false}),
     async (req,res) => {
-
+      res.json(req.user)
     }
   )
   router.get('/:ingredientId',
+    passport.authenticate('jwt', {session: false}),
     async (req,res) => {
 
     }
   )
   router.post('/',
+    passport.authenticate('jwt', {session: false}),
     async (req,res) => {
 
     }
   )
   router.put('/',
+    passport.authenticate('jwt', {session: false}),
     async (req,res) => {
 
     }
   )
   router.delete('/',
+    passport.authenticate('jwt', {session: false}),
     async (req,res) => {
 
     }
