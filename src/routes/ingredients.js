@@ -9,6 +9,7 @@ const jwt = require('jsonwebtoken')
 const errorBoom = require('../utils/functions/errorBoom')
 const ApiKeyService = require('../services/apiKeys')
 const RefreshTokensService = require('../services/refreshToken')
+const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
 
 require('../utils/auth/strategies/jwt')
 
@@ -21,6 +22,7 @@ const ingredientsRoutes = (app) => {
 
   router.get('/',
     passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['read:mosvies', 'read:movies']),
     async (req,res) => {
       res.json(req.user)
     }
