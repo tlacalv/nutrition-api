@@ -22,31 +22,35 @@ const ingredientsRoutes = (app) => {
 
   router.get('/',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['read:mosvies', 'read:movies']),
+    scopesValidationHandler(['read:ingredients']),
     async (req,res) => {
       res.json(req.user)
     }
   )
   router.get('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['read:ingredients']),
     async (req,res) => {
 
     }
   )
   router.post('/',
     passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
     async (req,res) => {
 
     }
   )
   router.put('/',
     passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
     async (req,res) => {
 
     }
   )
   router.delete('/',
     passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['deleteAll:ingredients']),
     async (req,res) => {
 
     }
