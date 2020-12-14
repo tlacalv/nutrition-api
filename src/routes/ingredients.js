@@ -42,7 +42,17 @@ const ingredientsRoutes = (app) => {
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
     async (req,res) => {
+      const { ingredientId } = req.params
+      try {
+        const ingredients = await ingredientsService.getIngredient({ingredientId})
+        res.status(200).json({
+          data: ingredients,
+          message: "Ingredients retrived"
+        })
 
+      } catch (error) {
+        errorBoom(error)
+      }
     }
   )
   router.post('/',
