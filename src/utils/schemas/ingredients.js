@@ -1,7 +1,7 @@
 const joi = require('@hapi/joi');
 
 //estructura regex de mongo
-const ingredientIdSchema = joi.object({ movieId: joi.string().regex(/^[0-9a-fA-F]{24}$/) } );
+const ingredientIdSchema = joi.object({ ingredientId: joi.string().regex(/^[0-9a-fA-F]{24}$/) } );
 const ingredientName = joi.string();
 const ingredientCalories = joi.number().max(1000);
 const ingredientFat = joi.number();

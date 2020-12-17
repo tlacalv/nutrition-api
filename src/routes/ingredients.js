@@ -1,6 +1,6 @@
 const express = require('express')
 const debug = require("debug")("app:api");
-const { createUserSchema } =require('../utils/schemas/users')
+const { ingredientIdSchema } =require('../utils/schemas/ingredients')
 const validationHandler = require('../utils/middleware/validationHandler')
 const { config } = require('../config')
 const boom = require('@hapi/boom')
@@ -41,6 +41,7 @@ const ingredientsRoutes = (app) => {
   router.get('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
+    validationHandler(ingredientIdSchema, 'params'),
     async (req,res) => {
       const { ingredientId } = req.params
       try {
