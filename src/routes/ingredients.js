@@ -1,6 +1,6 @@
 const express = require('express')
 const debug = require("debug")("app:api");
-const { ingredientIdSchema } =require('../utils/schemas/ingredients')
+const { ingredientIdSchema, ingredientSchema } =require('../utils/schemas/ingredients')
 const validationHandler = require('../utils/middleware/validationHandler')
 const { config } = require('../config')
 const boom = require('@hapi/boom')
@@ -59,8 +59,18 @@ const ingredientsRoutes = (app) => {
   router.post('/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
+    validationHandler(ingredientSchema, 'body'),
     async (req,res) => {
-
+      const {body: ingredient} = req;
+      try {
+        const ingredientId = await ingredientsService.createIngredient({ingredient});
+        res.status(201).json({
+          message: "Ingredient created",
+          id: ingredientId
+        })
+      } catch (error) {
+        errorBoom(error)
+      }
     }
   )
   router.put('/',
