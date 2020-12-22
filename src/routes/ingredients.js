@@ -11,6 +11,7 @@ const ApiKeyService = require('../services/apiKeys')
 const IngredientsService = require('../services/ingredients')
 const RefreshTokensService = require('../services/refreshToken')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
+const permissionValidation = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
@@ -73,11 +74,23 @@ const ingredientsRoutes = (app) => {
       }
     }
   )
-  router.put('/',
+  router.put('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
+    validationHandler(ingredientIdSchema, 'params'),
+    validationHandler(ingredientSchema, 'body'),
+    permissionValidation(),
     async (req,res) => {
-
+      const {body: ingredient} = req;
+      try {
+        const ingredientId = await ingredientsService.createIngredient({ingredient});
+        res.status(201).json({
+          message: "Ingredient created",
+          id: ingredientId
+        })
+      } catch (error) {
+        errorBoom(error)
+      }
     }
   )
   router.delete('/',
