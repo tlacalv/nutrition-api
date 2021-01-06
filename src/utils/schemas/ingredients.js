@@ -15,7 +15,6 @@ const ingredientSchema = joi.object({
   fat:             ingredientFat.required(),
   carbohydrate:    ingredientCarb.required(),
   protein:         ingredientProtein.required(),
-  userId:          ingredientUserId.required(),
 });
 
 

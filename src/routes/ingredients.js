@@ -2,6 +2,7 @@ const express = require('express')
 const debug = require("debug")("app:api");
 const { ingredientIdSchema, ingredientSchema } =require('../utils/schemas/ingredients')
 const validationHandler = require('../utils/middleware/validationHandler')
+const { ObjectId } = require('mongodb');
 const { config } = require('../config')
 const boom = require('@hapi/boom')
 const passport = require('passport')
@@ -11,7 +12,7 @@ const ApiKeyService = require('../services/apiKeys')
 const IngredientsService = require('../services/ingredients')
 const RefreshTokensService = require('../services/refreshToken')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
-const permissionValidation = require('../utils/middleware/permissionValidation')
+const {putIngredient} = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
@@ -62,7 +63,11 @@ const ingredientsRoutes = (app) => {
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
     validationHandler(ingredientSchema, 'body'),
     async (req,res) => {
-      const {body: ingredient} = req;
+      const {body} = req;
+      let ingredient= {
+        ...body,
+        userId: ObjectId(req.user._id)
+      }
       try {
         const ingredientId = await ingredientsService.createIngredient({ingredient});
         res.status(201).json({
@@ -79,7 +84,7 @@ const ingredientsRoutes = (app) => {
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
     validationHandler(ingredientIdSchema, 'params'),
     validationHandler(ingredientSchema, 'body'),
-    permissionValidation(),
+    putIngredient(),
     async (req,res) => {
       const {body: ingredient} = req;
       try {
