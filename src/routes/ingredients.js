@@ -90,7 +90,7 @@ const ingredientsRoutes = (app) => {
       const {body: ingredient} = req;
       try {
         const updatedIngredient = await ingredientsService.updateIngredient({ingredientId, ingredient});
-        res.status(201).json({
+        res.status(200).json({
           message: "Ingredient updated",
           id: updatedIngredient
         })
@@ -107,7 +107,7 @@ const ingredientsRoutes = (app) => {
       const { ingredientId } = req.params
       try {
         const deletedIngredient = await ingredientsService.deleteIngredient({ingredientId});
-        res.status(201).json({
+        res.status(200).json({
           message: "Ingredient deleted",
           id: deletedIngredient
         })
