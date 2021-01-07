@@ -6,18 +6,13 @@ const { ObjectId } = require('mongodb');
 const { config } = require('../config')
 const boom = require('@hapi/boom')
 const passport = require('passport')
-const jwt = require('jsonwebtoken')
 const errorBoom = require('../utils/functions/errorBoom')
-const ApiKeyService = require('../services/apiKeys')
 const IngredientsService = require('../services/ingredients')
-const RefreshTokensService = require('../services/refreshToken')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
 const {putIngredient} = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
-const apiKeysService = new ApiKeyService()
-const refreshTokensService = new RefreshTokensService()
 const ingredientsService = new IngredientsService()
 
 const ingredientsRoutes = (app) => {
