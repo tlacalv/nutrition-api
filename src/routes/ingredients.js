@@ -99,11 +99,21 @@ const ingredientsRoutes = (app) => {
       }
     }
   )
-  router.delete('/',
+  router.delete('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['deleteAll:ingredients']),
+    validationHandler(ingredientIdSchema, 'params'),
     async (req,res) => {
-
+      const { ingredientId } = req.params
+      try {
+        const deletedIngredient = await ingredientsService.deleteIngredient({ingredientId});
+        res.status(201).json({
+          message: "Ingredient deleted",
+          id: deletedIngredient
+        })
+      } catch (error) {
+        errorBoom(error)
+      }
     }
   )
   
