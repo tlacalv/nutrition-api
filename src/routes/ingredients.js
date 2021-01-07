@@ -86,12 +86,13 @@ const ingredientsRoutes = (app) => {
     validationHandler(ingredientSchema, 'body'),
     putIngredient(),
     async (req,res) => {
+      const { ingredientId } = req.params
       const {body: ingredient} = req;
       try {
-        const ingredientId = await ingredientsService.createIngredient({ingredient});
+        const updatedIngredient = await ingredientsService.updateIngredient({ingredientId, ingredient});
         res.status(201).json({
-          message: "Ingredient created",
-          id: ingredientId
+          message: "Ingredient updated",
+          id: updatedIngredient
         })
       } catch (error) {
         errorBoom(error)
