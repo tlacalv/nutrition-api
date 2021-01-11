@@ -1,6 +1,6 @@
 const express = require('express')
 const debug = require("debug")("app:api");
-const { ingredientIdSchema, ingredientSchema } =require('../utils/schemas/ingredients')
+const { recipeIdSchema, recipeSchema } =require('../utils/schemas/recipe')
 const validationHandler = require('../utils/middleware/validationHandler')
 const { ObjectId } = require('mongodb');
 const { config } = require('../config')
@@ -35,17 +35,17 @@ const recipesRoutes = (app) => {
       }
     }
   )
-  router.get('/:ingredientId',
+  router.get('/:recipeId',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['read:ingredients']),
-    validationHandler(ingredientIdSchema, 'params'),
+    scopesValidationHandler(['read:recipes']),
+    validationHandler(recipeIdSchema, 'params'),
     async (req,res) => {
-      const { ingredientId } = req.params
+      const { recipeId } = req.params
       try {
-        const ingredients = await ingredientsService.getIngredient({ingredientId})
+        const recipes = await recipesService.getRecipe({recipeId})
         res.status(200).json({
-          data: ingredients,
-          message: "Ingredients retrived"
+          data: recipes,
+          message: "Recipes retrived"
         })
 
       } catch (error) {
@@ -56,7 +56,7 @@ const recipesRoutes = (app) => {
   router.post('/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
-    validationHandler(ingredientSchema, 'body'),
+    validationHandler(recipeSchema, 'body'),
     async (req,res) => {
       const {body} = req;
       let ingredient= {
@@ -77,8 +77,8 @@ const recipesRoutes = (app) => {
   router.put('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
-    validationHandler(ingredientIdSchema, 'params'),
-    validationHandler(ingredientSchema, 'body'),
+    validationHandler(recipeIdSchema, 'params'),
+    validationHandler(recipeSchema, 'body'),
     putIngredient(),
     async (req,res) => {
       const { ingredientId } = req.params
@@ -97,7 +97,7 @@ const recipesRoutes = (app) => {
   router.delete('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['deleteAll:ingredients']),
-    validationHandler(ingredientIdSchema, 'params'),
+    validationHandler(recipeIdSchema, 'params'),
     async (req,res) => {
       const { ingredientId } = req.params
       try {
