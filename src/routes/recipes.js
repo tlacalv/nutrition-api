@@ -55,19 +55,29 @@ const recipesRoutes = (app) => {
   )
   router.post('/',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
+    scopesValidationHandler(['write:recipes', 'writeAll:recipes']),
     validationHandler(recipeSchema, 'body'),
     async (req,res) => {
       const {body} = req;
-      let ingredient= {
+      //transform ingredientsId into ObjectId
+      let ingredients = body.ingredients.map((ingredient) => {
+        let {quantity, ingredientId} = ingredient
+        return {
+          quantity,
+          ingredientId: ObjectId(ingredientId)
+        }
+      })
+      let recipe= {
         ...body,
         userId: ObjectId(req.user._id)
       }
+      //insert ingredients transformed to the object
+      recipe.ingredients = ingredients
       try {
-        const ingredientId = await ingredientsService.createIngredient({ingredient});
+        const recipeId = await recipesService.createRecipe({recipe});
         res.status(201).json({
-          message: "Ingredient created",
-          id: ingredientId
+          message: "Recipe created",
+          id: recipeId
         })
       } catch (error) {
         errorBoom(error)
