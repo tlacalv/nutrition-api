@@ -6,6 +6,8 @@ const jwt = require("jsonwebtoken")
 const boom = require('@hapi/boom')
 const authRoutes = require('./routes/auth')
 const ingredientsRoutes = require('./routes/ingredients')
+const recipesRoutes = require('./routes/recipes')
+
 
 
 app.use(express.json())
@@ -17,6 +19,8 @@ app.use(errorHandler)
 
 authRoutes(app)
 ingredientsRoutes(app)
+recipesRoutes(app)
+
 
 app.use('*',(req, res, next) => {
   res.status(404)
