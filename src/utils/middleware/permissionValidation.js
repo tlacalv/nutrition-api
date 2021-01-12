@@ -53,7 +53,38 @@ const putRecipe = () => {
   }
 }
 
+const deleteRecipe = () => {
+  //usamos middleware
+  return async (req, res, next) => {
+    const {presentScopes} = req
+    const { recipeId } = req.params
+
+    if(presentScopes.includes('delete:recipes')) {
+      const recipe = await recipesService.getRecipe({recipeId})
+      if(recipe) {
+        let userId = req.user._id.toString()
+        let recipeUserId = recipe.userId.toString()
+        if(userId===recipeUserId){ 
+          next()
+        }else{
+          errorBoom(boom.forbidden("Resource doesn't belong to user"),res)
+          next(boom.forbidden())
+        }
+      }
+      else {
+        errorBoom(boom.badRequest("Resource doesn't exists"),res)
+        next(boom.badRequest())
+      }
+    }
+    if(presentScopes.includes('deleteAll:recipes')) {
+      next()
+    }
+
+  }
+}
+
 module.exports = {
   putIngredient,
-  putRecipe
+  putRecipe,
+  deleteRecipe
 };

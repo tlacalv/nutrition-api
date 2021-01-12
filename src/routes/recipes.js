@@ -10,7 +10,7 @@ const passport = require('passport')
 const errorBoom = require('../utils/functions/errorBoom')
 const RecipesService = require('../services/recipes')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
-const {putRecipe} = require('../utils/middleware/permissionValidation')
+const {putRecipe, deleteRecipe} = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
@@ -105,17 +105,18 @@ const recipesRoutes = (app) => {
       }
     }
   )
-  router.delete('/:ingredientId',
+  router.delete('/:recipeId',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['deleteAll:ingredients']),
+    scopesValidationHandler(['deleteAll:recipes','delete:recipes']),
     validationHandler(recipeIdSchema, 'params'),
+    deleteRecipe(),
     async (req,res) => {
-      const { ingredientId } = req.params
+      const { recipeId } = req.params
       try {
-        const deletedIngredient = await ingredientsService.deleteIngredient({ingredientId});
+        const deletedRecipe = await recipesService.deleteRecipe({recipeId});
         res.status(200).json({
-          message: "Ingredient deleted",
-          id: deletedIngredient
+          message: "Recipe deleted",
+          id: deletedRecipe
         })
       } catch (error) {
         errorBoom(error)
