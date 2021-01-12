@@ -3,17 +3,19 @@ const debug = require("debug")("app:api");
 const { recipeIdSchema, recipeSchema } =require('../utils/schemas/recipe')
 const validationHandler = require('../utils/middleware/validationHandler')
 const { ObjectId } = require('mongodb');
+const objectIdIngredients = require('../utils/functions/objectIdIngredients')
 const { config } = require('../config')
 const boom = require('@hapi/boom')
 const passport = require('passport')
 const errorBoom = require('../utils/functions/errorBoom')
 const RecipesService = require('../services/recipes')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
-const {putIngredient} = require('../utils/middleware/permissionValidation')
+const {putRecipe} = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
 const recipesService = new RecipesService()
+
 
 const recipesRoutes = (app) => {
   const router = express.Router()
@@ -60,13 +62,8 @@ const recipesRoutes = (app) => {
     async (req,res) => {
       const {body} = req;
       //transform ingredientsId into ObjectId
-      let ingredients = body.ingredients.map((ingredient) => {
-        let {quantity, ingredientId} = ingredient
-        return {
-          quantity,
-          ingredientId: ObjectId(ingredientId)
-        }
-      })
+      let ingredients = objectIdIngredients(body.ingredients) 
+      
       let recipe= {
         ...body,
         userId: ObjectId(req.user._id)
@@ -84,23 +81,27 @@ const recipesRoutes = (app) => {
       }
     }
   )
-  router.put('/:ingredientId',
+  router.put('/:recipeId',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['write:ingredients', 'writeAll:ingredients']),
+    scopesValidationHandler(['write:recipes', 'writeAll:recipes']),
     validationHandler(recipeIdSchema, 'params'),
     validationHandler(recipeSchema, 'body'),
-    putIngredient(),
+    putRecipe(),
     async (req,res) => {
-      const { ingredientId } = req.params
-      const {body: ingredient} = req;
+      const { recipeId } = req.params
+      const {body: recipe} = req;
+      let ingredients = objectIdIngredients(recipe.ingredients)
+      //insert ingredients transformed to the object
+      recipe.ingredients= ingredients
       try {
-        const updatedIngredient = await ingredientsService.updateIngredient({ingredientId, ingredient});
+        const updatedRecipe = await recipesService.updateRecipe({recipeId, recipe});
         res.status(200).json({
-          message: "Ingredient updated",
-          id: updatedIngredient
+          message: "Recipe updated",
+          id: updatedRecipe
         })
       } catch (error) {
-        errorBoom(error)
+        debug(error)
+        errorBoom(error,res)
       }
     }
   )
