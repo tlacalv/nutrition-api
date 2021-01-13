@@ -35,6 +35,24 @@ const ingredientsRoutes = (app) => {
       }
     }
   )
+  router.get('/search/',
+    passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['read:ingredients']),
+    async (req, res) => {
+      const { queryString } = req.query
+      try {
+        const recipes = await ingredientsService.searchIngredient({text: queryString})
+        res.status(200).json({
+          data: recipes,
+          message: "Recipes retrived"
+        })
+
+      } catch (error) {
+        debug(error)
+        errorBoom(error, res)
+      }
+    }  
+  )
   router.get('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
