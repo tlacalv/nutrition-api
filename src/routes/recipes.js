@@ -37,6 +37,24 @@ const recipesRoutes = (app) => {
       }
     }
   )
+  router.get('/search/',
+    passport.authenticate('jwt', {session: false}),
+    scopesValidationHandler(['read:recipes']),
+    async (req, res) => {
+      const { queryString } = req.query
+      try {
+        const recipes = await recipesService.searchRecipe({text: queryString})
+        res.status(200).json({
+          data: recipes,
+          message: "Recipes retrived"
+        })
+
+      } catch (error) {
+        debug(error)
+        errorBoom(error, res)
+      }
+    }  
+  )
   router.get('/:recipeId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:recipes']),
@@ -55,6 +73,7 @@ const recipesRoutes = (app) => {
       }
     }
   )
+  
   router.post('/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['write:recipes', 'writeAll:recipes']),

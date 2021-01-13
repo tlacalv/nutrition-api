@@ -16,9 +16,16 @@ class RecipesService {
         return recipes || []
     }
     async searchRecipe({text}) {
-        const query = { $text: {$search: text}, score: { $meta: "textScore"}}
+        const query = { $text: {$search: text}}
         const sort = {score: {$meta: "textScore"}}
-        const recipes = await this.mongoDB.search(this.collection, query, sort)
+        const projection = {
+            name: 1,
+            ingredients: 1, 
+            weight: 1,
+            userId: 1,
+            score: { $meta: "textScore"}
+        }
+        const recipes = await this.mongoDB.search(this.collection, query, sort, projection)
         return recipes || []
     }
     async getRecipe ({ recipeId }) {
