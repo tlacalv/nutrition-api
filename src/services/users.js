@@ -11,6 +11,10 @@ class UsersService {
         const [ user ] = await this.mongoDB.getAll(this.collection, { email });
         return user;
     }
+    async getUsers () {
+        const users = await this.mongoDB.getAll(this.collection, {})
+        return users || []
+    }
 
     async createUser({ user }) {
         const { name, email, password, key } = user;
