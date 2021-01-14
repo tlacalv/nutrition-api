@@ -11,6 +11,10 @@ class UsersService {
         const [ user ] = await this.mongoDB.getAll(this.collection, { email });
         return user;
     }
+    async getUserById ({ userId }) {
+        const user  = await this.mongoDB.get(this.collection,  userId );
+        return user;
+    }
     async getUsers () {
         const users = await this.mongoDB.getAll(this.collection, {})
         return users || []
