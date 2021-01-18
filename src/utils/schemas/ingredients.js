@@ -7,7 +7,6 @@ const ingredientCalories = joi.number().max(1000);
 const ingredientFat = joi.number();
 const ingredientCarb = joi.number();
 const ingredientProtein = joi.number();
-const ingredientUserId = joi.string().regex(/^[0-9a-fA-F]{24}$/);
 
 const ingredientSchema = joi.object({
   name:            ingredientName.required(),
