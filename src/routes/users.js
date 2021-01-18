@@ -2,15 +2,11 @@ const express = require('express')
 const debug = require("debug")("app:api");
 const { userIdSchema } =require('../utils/schemas/users')
 const validationHandler = require('../utils/middleware/validationHandler')
-const { ObjectId } = require('mongodb');
-const objectIdIngredients = require('../utils/functions/objectIdIngredients')
-const { config } = require('../config')
 const boom = require('@hapi/boom')
 const passport = require('passport')
 const errorBoom = require('../utils/functions/errorBoom')
 const UsersService = require('../services/users')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
-const {putRecipe, deleteRecipe} = require('../utils/middleware/permissionValidation')
 
 require('../utils/auth/strategies/jwt')
 
@@ -34,7 +30,7 @@ const usersRoutes = (app) => {
         })
         res.status(200).json({
           data: users,
-          message: "Recipes retrived"
+          message: "Users retrived"
         })
 
       } catch (error) {
@@ -56,7 +52,7 @@ const usersRoutes = (app) => {
           delete user.key
           res.status(200).json({
             data: user,
-            message: "Recipes retrived"
+            message: "User retrived"
           })
         } else {
           errorBoom(boom.notFound(),res)
@@ -69,18 +65,17 @@ const usersRoutes = (app) => {
     }
   )
   
-  router.delete('/:recipeId',
+  router.delete('/:userId',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['delete:users']),
     validationHandler(userIdSchema, 'params'),
-    deleteRecipe(),
     async (req,res) => {
-      const { recipeId } = req.params
+      const { userId } = req.params
       try {
-        const deletedRecipe = await recipesService.deleteRecipe({recipeId});
+        const deletedUser = await usersService.deleteUser({userId});
         res.status(200).json({
-          message: "Recipe deleted",
-          id: deletedRecipe
+          message: "User deleted",
+          id: deletedUser
         })
       } catch (error) {
         errorBoom(error)
