@@ -1,13 +1,13 @@
 //dotenv config
 const express = require("express")
 const app = express()
-const {errorHandler, wrapErrors, logErrors} = require('./utils/middleware/errorHandlers')
+const {errorHandler, wrapErrors, logErrors} = require('./src/utils/middleware/errorHandlers')
 const jwt = require("jsonwebtoken")
 const boom = require('@hapi/boom')
-const authRoutes = require('./routes/auth')
-const ingredientsRoutes = require('./routes/ingredients')
-const recipesRoutes = require('./routes/recipes')
-const usersRoutes = require('./routes/users')
+const authRoutes = require('./src/routes/auth')
+const ingredientsRoutes = require('./src/routes/ingredients')
+const recipesRoutes = require('./src/routes/recipes')
+const usersRoutes = require('./src/routes/users')
 
 
 
@@ -30,4 +30,6 @@ app.use('*',(req, res, next) => {
 
 const PORT = 3000;
 
-module.exports = app
+app.listen(PORT, () => {
+  console.log(`server running in: http://localhost:${PORT}`)
+})

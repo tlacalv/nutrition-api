@@ -4,8 +4,8 @@
   "description": "An app to store and manage recipes and their nutrition values",
   "main": "src/index.js",
   "scripts": {
-    "dev": "DEBUG=app:* nodemon src/index.js",
-    "start": "NODE_ENV=production node src/index.js"
+    "dev": "DEBUG=app:* nodemon index.js",
+    "start": "NODE_ENV=production node index.js"
   },
   "keywords": [],
   "author": "Tlacaelel Leon",
