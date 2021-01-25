@@ -29,6 +29,5 @@ app.use('*',(req, res, next) => {
 })
 
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`server running in: http://localhost:${PORT}`)
-})
+
+module.exports = app
