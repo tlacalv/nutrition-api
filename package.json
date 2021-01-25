@@ -2,9 +2,10 @@
   "name": "nutrition-coocking",
   "version": "1.0.0",
   "description": "An app to store and manage recipes and their nutrition values",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
-    "start:dev": "DEBUG=app:* nodemon src/index.js"
+    "dev": "DEBUG=app:* nodemon src/index.js",
+    "start": "NODE_ENV=production node src/index.js"
   },
   "keywords": [],
   "author": "Tlacaelel Leon",
