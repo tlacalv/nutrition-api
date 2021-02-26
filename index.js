@@ -7,10 +7,13 @@ const boom = require('@hapi/boom')
 const authRoutes = require('./src/routes/auth')
 const ingredientsRoutes = require('./src/routes/ingredients')
 const recipesRoutes = require('./src/routes/recipes')
+const cors = require('cors')
 const usersRoutes = require('./src/routes/users')
 
 //helmet
 app.use(helmet())
+//cors
+app.use(cors())
 
 app.use(express.json())
 //errors
