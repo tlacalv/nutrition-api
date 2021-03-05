@@ -8,6 +8,7 @@ const errorBoom = require('../utils/functions/errorBoom')
 const IngredientsService = require('../services/ingredients')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
 const {putIngredient} = require('../utils/middleware/permissionValidation')
+const cacheControl = require('../utils/middleware/cacheControl')
 
 require('../utils/auth/strategies/jwt')
 
@@ -20,6 +21,7 @@ const ingredientsRoutes = (app) => {
   router.get('/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
+    cacheControl(),
     async (req,res) => {
       try {
         const ingredients = await ingredientsService.getIngredients()
@@ -36,6 +38,7 @@ const ingredientsRoutes = (app) => {
   router.get('/search/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
+    cacheControl(),
     async (req, res) => {
       const { queryString } = req.query
       try {
@@ -55,6 +58,7 @@ const ingredientsRoutes = (app) => {
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:ingredients']),
     validationHandler(ingredientIdSchema, 'params'),
+    cacheControl(),
     async (req,res) => {
       const { ingredientId } = req.params
       try {

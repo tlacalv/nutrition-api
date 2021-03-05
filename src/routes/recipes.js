@@ -9,6 +9,7 @@ const errorBoom = require('../utils/functions/errorBoom')
 const RecipesService = require('../services/recipes')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
 const {putRecipe, deleteRecipe} = require('../utils/middleware/permissionValidation')
+const cacheControl = require('../utils/middleware/cacheControl')
 
 require('../utils/auth/strategies/jwt')
 
@@ -22,6 +23,7 @@ const recipesRoutes = (app) => {
   router.get('/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:recipes']),
+    cacheControl(),
     async (req,res) => {
       try {
         const recipes = await recipesService.getRecipes()
@@ -38,6 +40,7 @@ const recipesRoutes = (app) => {
   router.get('/search/',
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:recipes']),
+    cacheControl(),
     async (req, res) => {
       const { queryString } = req.query
       try {
@@ -57,6 +60,7 @@ const recipesRoutes = (app) => {
     passport.authenticate('jwt', {session: false}),
     scopesValidationHandler(['read:recipes']),
     validationHandler(recipeIdSchema, 'params'),
+    cacheControl(),
     async (req,res) => {
       const { recipeId } = req.params
       try {

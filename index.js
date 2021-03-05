@@ -21,6 +21,14 @@ app.use(logErrors)
 app.use(wrapErrors)
 app.use(errorHandler)
 
+app.set('etag', false);
+
+app.use(express.static('public', {
+  cacheControl: false,
+  etag: false,
+  lastModified: false,
+}));
+
 
 authRoutes(app)
 ingredientsRoutes(app)
