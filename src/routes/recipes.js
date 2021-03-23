@@ -6,6 +6,7 @@ const { ObjectId } = require('mongodb');
 const objectIdIngredients = require('../utils/functions/objectIdIngredients')
 const passport = require('passport')
 const errorBoom = require('../utils/functions/errorBoom')
+const IngredientsService = require('../services/ingredients')
 const RecipesService = require('../services/recipes')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
 const {putRecipe, deleteRecipe} = require('../utils/middleware/permissionValidation')
@@ -14,6 +15,32 @@ const cacheControl = require('../utils/middleware/cacheControl')
 require('../utils/auth/strategies/jwt')
 
 const recipesService = new RecipesService()
+const ingredientsService = new IngredientsService()
+
+const fullRecipe = async (recipes) => {
+  const completeRecipesPromises = await recipes.map(async (recipe) => {
+    const completeIngredientsPromises = recipe.ingredients.map(
+      async (ingredient) => {
+        const completeIngredient = await ingredientsService.getIngredient(
+          { ingredientId: ingredient.ingredientId }
+        );
+        return {
+          quantity: ingredient.quantity,
+          ...completeIngredient,
+        };
+      }
+    );
+
+    const completeIngredients = await Promise.all(
+      completeIngredientsPromises
+    );
+    return {
+      ...recipe,
+      ingredients: completeIngredients,
+    };
+  });
+  return await Promise.all(completeRecipesPromises);
+}
 
 
 const recipesRoutes = (app) => {
@@ -26,9 +53,11 @@ const recipesRoutes = (app) => {
     cacheControl(),
     async (req,res) => {
       try {
-        const recipes = await recipesService.getRecipes()
+        const recipes = await recipesService.getRecipes();
+        const completeRecipes = await fullRecipe(recipes);
+        
         res.status(200).json({
-          data: recipes,
+          data: completeRecipes,
           message: "Recipes retrived"
         })
 
@@ -45,8 +74,10 @@ const recipesRoutes = (app) => {
       const { queryString } = req.query
       try {
         const recipes = await recipesService.searchRecipe({text: queryString})
+        const completeRecipes = await fullRecipe(recipes);
+
         res.status(200).json({
-          data: recipes,
+          data: completeRecipes,
           message: "Recipes retrived"
         })
 
@@ -65,8 +96,10 @@ const recipesRoutes = (app) => {
       const { recipeId } = req.params
       try {
         const recipes = await recipesService.getRecipe({recipeId})
+        const completeRecipes = await fullRecipe([recipes]);
+        
         res.status(200).json({
-          data: recipes,
+          data: completeRecipes[0],
           message: "Recipes retrived"
         })
 
