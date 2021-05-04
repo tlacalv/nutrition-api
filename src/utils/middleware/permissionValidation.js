@@ -29,6 +29,29 @@ const putIngredient = () => {
 
   }
 }
+const deleteIngredient = () => {
+  //usamos middleware
+  return async (req, res, next) => {
+    const {presentScopes} = req
+    const { ingredientId } = req.params
+
+    if(presentScopes.includes('delete:ingredients')) {
+      const ingredient = await ingredientsService.getIngredient({ingredientId})
+      let userId = req.user._id.toString()
+      let ingredientUserId = ingredient.userId.toString()
+      if(userId===ingredientUserId){ 
+        next()
+      }else{
+        errorBoom(boom.forbidden("Resource doesn't belong to user"),res)
+        next(boom.forbidden())
+      }
+    }
+    if(presentScopes.includes('writeAll:ingredients')) {
+      next()
+    }
+
+  }
+}
 const putRecipe = () => {
   //usamos middleware
   return async (req, res, next) => {
@@ -85,6 +108,7 @@ const deleteRecipe = () => {
 
 module.exports = {
   putIngredient,
+  deleteIngredient,
   putRecipe,
   deleteRecipe
 };

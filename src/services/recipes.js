@@ -15,8 +15,8 @@ class RecipesService {
         const recipes = await this.mongoDB.getAll(this.collection, query)
         return recipes || []
     }
-    async searchRecipe({text}) {
-        const query = { $text: {$search: text}}
+    async searchRecipe({text, userId}) {
+        const query = { $text: {$search: text}, userId}
         const sort = {score: {$meta: "textScore"}}
         const projection = {
             name: 1,
@@ -28,12 +28,16 @@ class RecipesService {
         const recipes = await this.mongoDB.search(this.collection, query, sort, projection)
         return recipes || []
     }
+    async getOwnRecipe ({ recipeId, userId}) {
+        
+        const recipe = await this.mongoDB.getOwn(this.collection, recipeId, userId);
+        return recipe;
+    }
     async getRecipe ({ recipeId }) {
         
         const recipe = await this.mongoDB.get(this.collection, recipeId);
         return recipe;
     }
-
     async createRecipe({ recipe }) {
         const createdRecipe = await this.mongoDB.create(this.collection, recipe)
         return createdRecipe;

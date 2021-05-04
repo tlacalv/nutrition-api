@@ -7,7 +7,7 @@ const passport = require('passport')
 const errorBoom = require('../utils/functions/errorBoom')
 const IngredientsService = require('../services/ingredients')
 const scopesValidationHandler = require('../utils/middleware/scopesValidationHandler')
-const {putIngredient} = require('../utils/middleware/permissionValidation')
+const {putIngredient, deleteIngredient} = require('../utils/middleware/permissionValidation')
 const cacheControl = require('../utils/middleware/cacheControl')
 
 require('../utils/auth/strategies/jwt')
@@ -24,7 +24,7 @@ const ingredientsRoutes = (app) => {
     cacheControl(),
     async (req,res) => {
       try {
-        const ingredients = await ingredientsService.getIngredients()
+        const ingredients = await ingredientsService.getUserIngredients({userId: req.user._id})
         res.status(200).json({
           data: ingredients,
           message: "Ingredients retrived"
@@ -42,7 +42,7 @@ const ingredientsRoutes = (app) => {
     async (req, res) => {
       const { queryString } = req.query
       try {
-        const recipes = await ingredientsService.searchIngredient({text: queryString})
+        const recipes = await ingredientsService.searchIngredient({text: queryString, userId: req.user._id})
         res.status(200).json({
           data: recipes,
           message: "Recipes retrived"
@@ -62,7 +62,12 @@ const ingredientsRoutes = (app) => {
     async (req,res) => {
       const { ingredientId } = req.params
       try {
-        const ingredients = await ingredientsService.getIngredient({ingredientId})
+        const ingredients = await ingredientsService.getOwnIngredient({ingredientId, userId: req.user._id})
+        if(!ingredients) {
+          return res.status(404).json({
+            message: "Ingredient not found"
+          })
+        }
         res.status(200).json({
           data: ingredients,
           message: "Ingredients retrived"
@@ -116,8 +121,9 @@ const ingredientsRoutes = (app) => {
   )
   router.delete('/:ingredientId',
     passport.authenticate('jwt', {session: false}),
-    scopesValidationHandler(['deleteAll:ingredients']),
+    scopesValidationHandler(['deleteAll:ingredients', 'delete:ingredients']),
     validationHandler(ingredientIdSchema, 'params'),
+    deleteIngredient(),
     async (req,res) => {
       const { ingredientId } = req.params
       try {
@@ -127,6 +133,7 @@ const ingredientsRoutes = (app) => {
           id: deletedIngredient
         })
       } catch (error) {
+        console.log(error)
         errorBoom(error)
       }
     }

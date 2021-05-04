@@ -15,8 +15,8 @@ class IngredientsService {
         const ingredients = await this.mongoDB.getAll(this.collection, query)
         return ingredients || []
     }
-    async searchIngredient ({text}) {
-        const query = { $text: {$search: text}}
+    async searchIngredient ({text, userId}) {
+        const query = { $text: {$search: text}, userId}
         const sort = {score: {$meta: "textScore"}}
         const projection = {
             name: 1,
@@ -30,12 +30,16 @@ class IngredientsService {
         const ingredients = await this.mongoDB.search(this.collection, query, sort, projection)
         return ingredients || []
     }
+    async getOwnIngredient ({ ingredientId, userId }) {
+        
+        const ingredient = await this.mongoDB.getOwn(this.collection, ingredientId, userId);
+        return ingredient;
+    }
     async getIngredient ({ ingredientId }) {
         
         const ingredient = await this.mongoDB.get(this.collection, ingredientId);
         return ingredient;
     }
-
     async createIngredient({ ingredient }) {
         const createdIngredient = await this.mongoDB.create(this.collection, ingredient)
         return createdIngredient;

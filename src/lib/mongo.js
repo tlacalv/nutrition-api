@@ -52,6 +52,12 @@ class MongoLib {
         return db.collection(collection).findOne({ _id: ObjectId(id) });
       })
   }
+  getOwn(collection, id, userId) {
+    return this.connect()
+      .then(db => {
+        return db.collection(collection).findOne({ _id: ObjectId(id), userId });
+      })
+  }
   create(collection, data) {
     return this.connect()
       .then(db => {

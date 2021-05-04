@@ -53,9 +53,8 @@ const recipesRoutes = (app) => {
     cacheControl(),
     async (req,res) => {
       try {
-        const recipes = await recipesService.getRecipes();
+        const recipes = await recipesService.getUserRecipes({userId: req.user._id})
         const completeRecipes = await fullRecipe(recipes);
-        
         res.status(200).json({
           data: completeRecipes,
           message: "Recipes retrived"
@@ -73,7 +72,7 @@ const recipesRoutes = (app) => {
     async (req, res) => {
       const { queryString } = req.query
       try {
-        const recipes = await recipesService.searchRecipe({text: queryString})
+        const recipes = await recipesService.searchRecipe({text: queryString, userId: req.user._id})
         const completeRecipes = await fullRecipe(recipes);
 
         res.status(200).json({
@@ -95,7 +94,12 @@ const recipesRoutes = (app) => {
     async (req,res) => {
       const { recipeId } = req.params
       try {
-        const recipes = await recipesService.getRecipe({recipeId})
+        const recipes = await recipesService.getOwnRecipe({recipeId, userId: req.user._id})
+        if(!recipes) {
+          return res.status(404).json({
+            message: "Recipe Not found"
+          })
+        }
         const completeRecipes = await fullRecipe([recipes]);
         
         res.status(200).json({
@@ -104,6 +108,7 @@ const recipesRoutes = (app) => {
         })
 
       } catch (error) {
+        console.log(error)
         errorBoom(error)
       }
     }
