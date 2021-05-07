@@ -46,7 +46,7 @@ const deleteIngredient = () => {
         next(boom.forbidden())
       }
     }
-    if(presentScopes.includes('writeAll:ingredients')) {
+    if(presentScopes.includes('deleteAll:ingredients')) {
       next()
     }
 
